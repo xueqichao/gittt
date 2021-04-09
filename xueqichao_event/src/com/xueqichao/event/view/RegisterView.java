@@ -71,7 +71,6 @@ public class RegisterView
         jFrame.add(box4);
         jFrame.add(Box.createHorizontalStrut(100), BorderLayout.EAST);
         jFrame.add(Box.createHorizontalStrut(100),BorderLayout.WEST);
-        jFrame.add(Box.createVerticalStrut(50),BorderLayout.SOUTH);
         jFrame.setBounds((ScreenUtil.getScreenWidth() - 900)/2 + 300, (ScreenUtil.getScreenHeight() - 450)/2 + 80, 900, 450);
         jFrame.setResizable(false);
         jFrame.pack();

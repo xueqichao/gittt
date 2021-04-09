@@ -2,10 +2,10 @@ package com.xueqichao.event.entity;
 
 public class Scenic
 {
-    int sid;
-    String scenicName;
-    String scenicDesc;
-    int staNum;
+    private int sid;
+    private String scenicName;
+    private String scenicDesc;
+    private int staNum;
 
     public int getSid() {
         return sid;
@@ -39,7 +39,8 @@ public class Scenic
         this.staNum = staNum;
     }
 
-    public Scenic(String scenicName, String scenicDesc) {
+    public Scenic(int sid, String scenicName, String scenicDesc) {
+        this.sid = sid;
         this.scenicName = scenicName;
         this.scenicDesc = scenicDesc;
     }

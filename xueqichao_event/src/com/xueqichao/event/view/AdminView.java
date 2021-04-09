@@ -100,17 +100,16 @@ public class AdminView
                     jSplitPane.setRightComponent(new AdminTree1View());
                 }
                 else if(treeNode2.equals(lastPathComponent)){
-                    jSplitPane.setRightComponent(new JLabel("这里进行门票管理。。。"));
+                    jSplitPane.setRightComponent(new AdminTree2View());
                 }
                 else if(treeNode3.equals(lastPathComponent)){
-                    jSplitPane.setRightComponent(new JLabel("这里进行用户管理。。。"));
+                    jSplitPane.setRightComponent(new AdminTree3View());
                 }
                 else if(treeNode4.equals(lastPathComponent)){
                     jSplitPane.setRightComponent(new JLabel("这里进行景评管理。。。"));
                 }
             }
         });
-
 
 
         jMenuItem1.addActionListener(new MyListener());

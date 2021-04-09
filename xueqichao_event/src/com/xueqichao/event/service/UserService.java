@@ -3,6 +3,8 @@ package com.xueqichao.event.service;
 import com.xueqichao.event.dao.UserDao;
 import com.xueqichao.event.entity.User;
 
+import java.util.Vector;
+
 /**
  * @author lenovo
  * 这个类用于将view层的用户数据与dao层用户数据进行比较
@@ -38,6 +40,25 @@ public class UserService
 
     }
 
+    public Vector<Vector> lookUser(){
+        return userDao.lookUserMysql();
+    }
+
+    public int closeUser(int uid){
+        return userDao.closeUserStateMysql(uid);
+    }
+
+    public int openUser(int uid){
+        return userDao.openUserStateMysql(uid);
+    }
+
+    public User look(int uid){
+        return userDao.lookMysql(uid);
+    }
+
+    public void chargeUser(int uid,int balance){
+        userDao.chargeUserMysql(uid, balance);
+    }
 
 
 }

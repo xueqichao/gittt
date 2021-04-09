@@ -1,6 +1,7 @@
 package com.xueqichao.event.dao;
 
-import com.xueqichao.event.entity.Scenic;
+import com.xueqichao.event.entity.Ticket;
+import com.xueqichao.event.entity.User;
 import com.xueqichao.event.util.JdbcUtil;
 
 import java.sql.Connection;
@@ -9,25 +10,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
-public class ScenicDao
+public class TicketDao
 {
-
-    public Vector<Vector> lookScenicMysql() {
-        String sql1 = "select * from s_information";
+    public Vector<Vector> lookTicketMysql() {
+        String sql1 = "select ticket.tid,s_information.science_name,ticket.time,ticket.number,ticket.price " +
+                      "from s_information,ticket " +
+                      "where ticket.sid=s_information.sid ";
         Vector vector = new Vector();
         Connection co = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-
         try {
             co = JdbcUtil.getConnection();
             ps = co.prepareStatement(sql1);
             rs = ps.executeQuery();
             while (rs.next()) {
                 Vector vector1 = new Vector();
-                vector1.add(rs.getInt("sid"));
+                vector1.add(rs.getInt("tid"));
                 vector1.add(rs.getString("science_name"));
-                vector1.add(rs.getString("science_desc"));
+                vector1.add(rs.getString("time"));
+                vector1.add(rs.getInt("number"));
+                vector1.add(rs.getInt("price"));
                 vector.add(vector1);
             }
         } catch (SQLException throwable) {
@@ -38,16 +41,17 @@ public class ScenicDao
         return vector;
     }
 
-
-    public void keepScenicMysql(String scenicName,String scenicDesc) {
-        String sql1 = "insert into s_information values(null,?,?,0)";
+    public void keepTicketMysql(String time,int number,int sid,int price) {
+        String sql1 = "insert into ticket values(null,?,?,?,?)";
         Connection co = null;
         PreparedStatement ps = null;
         try {
             co = JdbcUtil.getConnection();
             ps = co.prepareStatement(sql1);
-            ps.setString(1,scenicName);
-            ps.setString(2,scenicDesc);
+            ps.setString(1,time);
+            ps.setInt(2,number);
+            ps.setInt(3,sid);
+            ps.setInt(4,price);
             ps.executeUpdate();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
@@ -56,17 +60,15 @@ public class ScenicDao
         }
     }
 
-
-    public int deleteScenicMysql(String scenicName,String scenicDesc) {
-        String sql1 = "delete from s_information where science_name=? and science_desc=?";
+    public int deleteTicketMysql(int tid) {
+        String sql1 = "delete from ticket where tid=?";
         Connection co = null;
         PreparedStatement ps = null;
         int a = 0;
         try {
             co = JdbcUtil.getConnection();
             ps = co.prepareStatement(sql1);
-            ps.setString(1,scenicName);
-            ps.setString(2,scenicDesc);
+            ps.setInt(1,tid);
             a = ps.executeUpdate();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
@@ -76,72 +78,55 @@ public class ScenicDao
         return a;
     }
 
-
-
-    public int updateScenicMysql(String scenicName,String scenicDesc,int sid) {
-        String sql1 = "update s_information set science_name=? , science_desc=? where sid=?";
-        Connection co = null;
-        PreparedStatement ps = null;
-        int a = 0;
-        try {
-            co = JdbcUtil.getConnection();
-            ps = co.prepareStatement(sql1);
-            ps.setString(1,scenicName);
-            ps.setString(2,scenicDesc);
-            ps.setInt(3,sid);
-            a = ps.executeUpdate();
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
-        } finally {
-            JdbcUtil.close(co, ps);
-        }
-        return a;
-    }
-
-    public Scenic lookExistMysql(int sid) {
-        String sql1 = "select * from s_information where sid=?";
+    public Ticket getInstanceMysql(int tid) {
+        String sql1 = "select * from ticket where tid=?";
 
         Connection co = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        Scenic scenic = null;
+        Ticket ticket1 = null;
         try {
             co = JdbcUtil.getConnection();
             ps = co.prepareStatement(sql1);
-            ps.setInt(1, sid);
+            ps.setInt(1, tid);
             rs = ps.executeQuery();
             if (rs.next()) {
-                scenic = new Scenic(rs.getInt(1),rs.getString(2), rs.getString(3));
+                ticket1= new Ticket(rs.getInt("tid"),rs.getInt("number"),rs.getString("time"),rs.getInt("price"));
             }
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         } finally {
             JdbcUtil.close(co, ps, rs);
         }
-        return scenic;
+        return ticket1;
     }
 
-    public Scenic isExistMysql(String scenicName) {
-        String sql1 = "select * from s_information where science_name=?";
+    public int updateTicketMysql(int tid,String time,int number,int price) {
+        String sql1 = "update ticket set time=?,number=?,price=? where tid=?";
         Connection co = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
-        Scenic scenic = null;
+        int a = 0;
         try {
             co = JdbcUtil.getConnection();
             ps = co.prepareStatement(sql1);
-            ps.setString(1,scenicName);
-            rs = ps.executeQuery();
-            if(rs.next()){
-                scenic = new Scenic(rs.getInt("sid"),rs.getString("science_name"),rs.getString("science_desc"));
-            }
+            ps.setString(1,time);
+            ps.setInt(2,number);
+            ps.setInt(3,price);
+            ps.setInt(4,tid);
+            a = ps.executeUpdate();
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         } finally {
             JdbcUtil.close(co, ps);
         }
-        return scenic;
+        return a;
     }
+
+
+
+
+
+
 
 
 

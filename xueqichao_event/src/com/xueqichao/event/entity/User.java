@@ -9,6 +9,7 @@ public class User {
     private String userName;
     private String userPassword;
     private int balance;
+    private int state;
 
 
     public int getUid() {
@@ -42,10 +43,24 @@ public class User {
         this.balance = balance;
     }
 
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     public User(String userName, String userPassword) {
         this.userName = userName;
         this.userPassword = userPassword;
     }
 
-
+    public User(int uid, String userName, String userPassword, int balance, int state) {
+        this.uid = uid;
+        this.userName = userName;
+        this.userPassword = userPassword;
+        this.balance = balance;
+        this.state = state;
+    }
 }
