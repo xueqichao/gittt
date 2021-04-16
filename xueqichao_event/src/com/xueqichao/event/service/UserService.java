@@ -60,5 +60,46 @@ public class UserService
         userDao.chargeUserMysql(uid, balance);
     }
 
+    public User getInstance(String userName){
+        return userDao.isExistMysql(userName);
+    }
+
+    public int updateUserbalance(int balance,int uid){
+        return userDao.updateUserbalanceMysql(balance,uid);
+    }
+
+    public Vector lookUsernameMysql(){
+        return userDao.lookUsernameMysql();
+    }
+
+    public String lookPasswordMysql(String username){
+        return userDao.lookPasswordMysql(username);
+    }
+
+    public void keepPass(int a,String username){
+        userDao.keepPassMysql(a,username);
+    }
+
+    public int keepPasswordMysql(String username){
+        return userDao.keepPasswordMysql(username);
+    }
+
+
+    public void updateAutoMysql(){
+        userDao.updateAutoMysql();
+    }
+
+    public void updateAutoMysql(String username){
+        userDao.updateAutoMysql(username);
+    }
+
+    public String lookautoMysql(){
+        return userDao.lookautoMysql();
+    }
+
+    public int lookAutoMysql(String username){
+        return userDao.lookAutoMysql(username);
+    }
+
 
 }

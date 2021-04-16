@@ -31,7 +31,6 @@ public class AdminTree1View extends Box {
     JButton jButton2 = new JButton("删除");
     JButton jButton3 = new JButton("修改");
     JButton jButton4 = new JButton("查看");
-    JButton update = new JButton("刷新");
 
     JTable jTable;
 
@@ -47,20 +46,19 @@ public class AdminTree1View extends Box {
         jPanel.add(jButton2);
         jPanel.add(jButton3);
         jPanel.add(jButton4);
-        jPanel.add(update);
 
-        // TODO 监听器
+
         jButton1.addActionListener(new MyListener());
         jButton2.addActionListener(new MyListener());
         jButton3.addActionListener(new MyListener());
         jButton4.addActionListener(new MyListener());
-        update.addActionListener(new MyListener());
 
 
 
         v1.add("序号");
         v1.add("景点名称");
         v1.add("景点描述");
+        v1.add("评论数量");
 
         jTable = new JTable(scenicService.lookScenic(),v1);
         jTable.addMouseListener(new MouseAdapter() {
@@ -90,7 +88,7 @@ public class AdminTree1View extends Box {
         @Override
         public void actionPerformed(ActionEvent e) {
            if(e.getSource() == jButton1){
-               new AdminTree1View().initAdd();
+               new AdminTree1View().initAdd(jTable);
            }
            if(e.getSource() == jButton2){
                if(row == -1){
@@ -100,12 +98,13 @@ public class AdminTree1View extends Box {
                    int a = JOptionPane.showConfirmDialog(null,"确认删除吗?","确认",JOptionPane.YES_NO_OPTION);
                    if(a == 0){
                        if(scenicService.deleteScenic(scenicName,scenicDesc) == 1){
-                           JOptionPane.showMessageDialog(null,"删除成功！请刷新！");
+                           JOptionPane.showMessageDialog(null,"删除成功!");
+                           new AdminTree1View().updateTable(jTable);
                        }
                        else{
-                           JOptionPane.showMessageDialog(null,"所要删除的信息不存在！请刷新！");
+                           JOptionPane.showMessageDialog(null,"该景点有相连门票或评论,无法删除！");
                        }
-                       row = -1;
+
                    }
 
                }
@@ -115,7 +114,7 @@ public class AdminTree1View extends Box {
                    JOptionPane.showMessageDialog(null,"请选择要修改的信息！");
                }
                else{
-                   new AdminTree1View().initUpdate(scenicName,scenicDesc,sid);
+                   new AdminTree1View().initUpdate(scenicName,scenicDesc,sid,jTable);
                }
 
            }
@@ -127,14 +126,6 @@ public class AdminTree1View extends Box {
                    new AdminTree1View().initLook(scenicName,scenicDesc);
                }
 
-           }
-           if(e.getSource() == update){
-               DefaultTableModel dtm = (DefaultTableModel) jTable.getModel();
-               dtm.setRowCount(0);
-               for(Vector v : scenicService.lookScenic()){
-                   dtm.addRow(v);
-                   row = -1;
-               }
            }
 
         }
@@ -163,8 +154,10 @@ public class AdminTree1View extends Box {
     Box box3 = Box.createHorizontalBox();
     Box box4 = Box.createVerticalBox();
 
-    private void initAdd(){
+    private void initAdd(JTable jTable1){
         jFrame1.setBounds((ScreenUtil.getScreenWidth() - 350)/2,(ScreenUtil.getScreenHeight() - 350)/2,350,320);
+
+        jTable = jTable1;
 
         box1.add(jLabel1);
         box1.add(Box.createHorizontalStrut(20));
@@ -218,9 +211,10 @@ public class AdminTree1View extends Box {
                         JOptionPane.showMessageDialog(null,"添加的景点信息已存在！");
                     }
                     else{
-                        JOptionPane.showMessageDialog(jFrame1,"添加成功！请刷新！");
+                        JOptionPane.showMessageDialog(jFrame1,"添加成功！");
                         scenicService.keepScenic(scenicName,scenicDesc);
                         jFrame1.dispose();
+                        new AdminTree1View().updateTable(jTable);
                     }
                 }
             }
@@ -248,8 +242,9 @@ public class AdminTree1View extends Box {
     Box box7 = Box.createHorizontalBox();
     Box box8 = Box.createVerticalBox();
 
-    private void initUpdate(String scenicName,String scenicDesc,int sid){
+    private void initUpdate(String scenicName,String scenicDesc,int sid,JTable jTable1){
 
+        jTable = jTable1;
         scenic = new Scenic(scenicService.lookExistMysql(sid).getSid(),scenicService.lookExistMysql(sid).getScenicName(),
                 scenicService.lookExistMysql(sid).getScenicDesc());
 
@@ -313,9 +308,10 @@ public class AdminTree1View extends Box {
                     JOptionPane.showMessageDialog(null,"您并未做出修改！");
                 }
                 else {
-                    JOptionPane.showMessageDialog(jFrame2,"修改成功！请刷新！");
+                    JOptionPane.showMessageDialog(jFrame2,"修改成功！");
                     scenicService.updateScenicMysql(scenicName,scenicDesc,scenic.getSid());
                     jFrame2.dispose();
+                    new AdminTree1View().updateTable(jTable);
                 }
             }
             if(e.getSource() == jButton8){
@@ -371,20 +367,27 @@ public class AdminTree1View extends Box {
         jTextField3.setEditable(false);
         jTextArea3.setEditable(false);
 
-        jButton9.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(e.getSource() == jButton9){
-                    jFrame3.dispose();
-                }
-            }
+        jButton9.addActionListener(e -> {if(e.getSource() == jButton9){
+                    jFrame3.dispose();}
         });
 
 
         jFrame3.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         jFrame3.setVisible(true);
 
-
     }
+
+
+    public void updateTable(JTable jTable){
+        DefaultTableModel dtm = (DefaultTableModel) jTable.getModel();
+        dtm.setRowCount(0);
+        for(Vector v : scenicService.lookScenic()){
+            dtm.addRow(v);
+            row = -1;
+        }
+    }
+
+
+
 
 }

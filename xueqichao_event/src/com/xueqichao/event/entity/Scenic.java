@@ -44,4 +44,11 @@ public class Scenic
         this.scenicName = scenicName;
         this.scenicDesc = scenicDesc;
     }
+
+    public Scenic(int sid, String scenicName, String scenicDesc, int staNum) {
+        this.sid = sid;
+        this.scenicName = scenicName;
+        this.scenicDesc = scenicDesc;
+        this.staNum = staNum;
+    }
 }

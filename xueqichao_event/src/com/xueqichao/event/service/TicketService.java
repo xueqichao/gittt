@@ -28,5 +28,17 @@ public class TicketService
         return ticketDao.updateTicketMysql(tid,time,number,price);
     }
 
+    public Ticket getInstanceMysql(int sid,String time){
+        return ticketDao.getInstanceMysql(sid,time);
+    }
+
+    public Vector<Vector> lookTicket(String information){
+        return ticketDao.lookTicketMysql(information);
+    }
+
+    public int updateTicketNum(int tid,int number){
+        return ticketDao.updateTicketMysql(tid,number);
+    }
+
 
 }

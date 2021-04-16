@@ -35,7 +35,6 @@ public class AdminTree3View extends Box
     JButton jButton1 = new JButton("封号");
     JButton jButton2 = new JButton("解封");
     JButton jButton3 = new JButton("充值");
-    JButton update = new JButton("刷新");
 
     JTable jTable;
 
@@ -50,12 +49,10 @@ public class AdminTree3View extends Box
         jPanel.add(jButton1);
         jPanel.add(jButton2);
         jPanel.add(jButton3);
-        jPanel.add(update);
 
         jButton1.addActionListener(new Listener1());
         jButton2.addActionListener(new Listener1());
         jButton3.addActionListener(new Listener1());
-        update.addActionListener(new Listener1());
 
 
         v1.add("序   号");
@@ -102,7 +99,8 @@ public class AdminTree3View extends Box
                     int a = JOptionPane.showConfirmDialog(null,"确认封禁该用户吗?","确认",JOptionPane.YES_NO_OPTION);
                     if(a == 0){
                         userService.closeUser(uid);
-                        JOptionPane.showMessageDialog(null,"封禁成功!请刷新！");
+                        JOptionPane.showMessageDialog(null,"封禁成功!");
+                        new AdminTree3View().updateTable(jTable);
                     }
                 }
             }
@@ -117,7 +115,8 @@ public class AdminTree3View extends Box
                     int a = JOptionPane.showConfirmDialog(null,"确认解封该用户吗?","确认",JOptionPane.YES_NO_OPTION);
                     if(a == 0){
                         userService.openUser(uid);
-                        JOptionPane.showMessageDialog(null,"解封成功!请刷新！");
+                        JOptionPane.showMessageDialog(null,"解封成功!");
+                        new AdminTree3View().updateTable(jTable);
                     }
                 }
             }
@@ -126,17 +125,8 @@ public class AdminTree3View extends Box
                     JOptionPane.showMessageDialog(null,"请选择要充值的用户！");
                 }
                 else{
-                    new AdminTree3View().initCharge(uid);
+                    new AdminTree3View().initCharge(uid,jTable);
                 }
-            }
-            if(e.getSource() == update){
-                DefaultTableModel dtm = (DefaultTableModel) jTable.getModel();
-                dtm.setRowCount(0);
-                for(Vector v : userService.lookUser()){
-                    dtm.addRow(v);
-                    row = -1;
-                }
-
             }
 
         }
@@ -152,7 +142,9 @@ public class AdminTree3View extends Box
     Box box2 = Box.createHorizontalBox();
     Box box3 = Box.createVerticalBox();
 
-    private void initCharge(int uid){
+    private void initCharge(int uid,JTable jTable1){
+        jTable = jTable1;
+
         jFrame.setBounds((ScreenUtil.getScreenWidth() - 300)/2,(ScreenUtil.getScreenHeight() - 200)/2,300,200);
 
         user = userService.look(uid);
@@ -187,15 +179,16 @@ public class AdminTree3View extends Box
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == jButton4){
-                if(jTextField.getText().equals("")){
+                if("".equals(jTextField.getText())){
                     JOptionPane.showMessageDialog(null,"充值金额不能为空！");
                 }
                 else{
                     int b = Integer.parseInt(jTextField.getText());
-                    JOptionPane.showMessageDialog(null,"充值成功！请刷新！");
+                    JOptionPane.showMessageDialog(null,"充值成功！");
                     jFrame.dispose();
                     int ba = b + user.getBalance();
                     userService.chargeUser(user.getUid(),ba);
+                    new AdminTree3View().updateTable(jTable);
                 }
             }
             if(e.getSource() == jButton5){
@@ -204,6 +197,15 @@ public class AdminTree3View extends Box
         }
     }
 
+
+    public void updateTable(JTable jTable){
+        DefaultTableModel dtm = (DefaultTableModel) jTable.getModel();
+        dtm.setRowCount(0);
+        for(Vector v : userService.lookUser()){
+            dtm.addRow(v);
+            row = -1;
+        }
+    }
 
 
 

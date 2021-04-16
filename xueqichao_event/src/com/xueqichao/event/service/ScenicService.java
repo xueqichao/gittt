@@ -33,7 +33,13 @@ public class ScenicService
         return scenicDao.isExistMysql(scenicName);
     }
 
+    public int updateScenicMysql(int sid,int sta_num){
+        return scenicDao.updateScenicMysql(sid,sta_num);
+    }
 
+    public Vector<Vector> lookScenicMysql(String information){
+        return scenicDao.lookScenicMysql(information);
+    }
 
 
 

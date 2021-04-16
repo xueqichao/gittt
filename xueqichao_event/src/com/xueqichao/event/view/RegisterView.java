@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *   这是注册页面
@@ -85,18 +87,29 @@ public class RegisterView
 
     private void check(String userName,String passWord){
 
+       Pattern p = Pattern.compile("((13\\d)|(15\\d)|(17\\d)|(18\\d)|(19\\d)|(16\\d))\\d{8}");
+       Matcher m = p.matcher(userName);
+       Pattern pp = Pattern.compile("\\d{8}");
+       Matcher mm = pp.matcher(passWord);
        if("".equals(userName)){
            JOptionPane.showMessageDialog(null,"账号不能为空");
        }
        else if("".equals(passWord)){
            JOptionPane.showMessageDialog(null,"密码不能为空");
         }
+       else if(!m.matches()){
+           JOptionPane.showMessageDialog(null,"账号格式不正确！");
+       }
+       else if(!mm.matches()){
+           JOptionPane.showMessageDialog(null,"密码格式为8位数字！");
+       }
        else if(userService.isExist(userName)){
            JOptionPane.showMessageDialog(null,"该账号已被注册");
        }
        else {
+           String ab = "注册成功";
            int a = JOptionPane.showConfirmDialog(null,"确定注册吗？","确定信息正确",JOptionPane.YES_NO_OPTION);
-           if(a == 0 ){JOptionPane.showMessageDialog(null,"注册成功");
+           if(a == 0 ){JOptionPane.showMessageDialog(null,ab);
                jFrame.dispose();
                new LoginView().init();
                userService.keepUser(userName,passWord);}

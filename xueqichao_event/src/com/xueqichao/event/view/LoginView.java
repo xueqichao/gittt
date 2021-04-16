@@ -23,22 +23,28 @@ public class LoginView
   UserService userService = new UserService();
   AdminService adminService = new AdminService();
   private String position = null;
+  private String keepPass = "";
+  private String auto = "";
   private final JFrame jf = new JFrame("登录界面");
   private final JLabel jLabel1 = new JLabel("账 号:");
   private final JLabel jLabel2 = new JLabel("密 码:");
-  private final JTextField jTextField = new JTextField(15);
+  private final JComboBox jComboBox = new JComboBox(userService.lookUsernameMysql());
   private final JPasswordField jPasswordField = new JPasswordField(15);
   private final JButton jButton1 = new JButton("登录");
   private final JButton jButton2 = new JButton("注册");
   private final JRadioButton jRadioButton1 = new JRadioButton("用户",false);
   private final JRadioButton jRadioButton2 = new JRadioButton("管理员",false);
   private final JRadioButton jRadioButton3 = new JRadioButton("游客",false);
+  private final JRadioButton jRadioButton4 = new JRadioButton("保存密码",false);
+  private final JRadioButton jRadioButton5 = new JRadioButton("自动登录",false);
   private final ButtonGroup buttonGroup = new ButtonGroup();
   private final Box box1 = Box.createHorizontalBox();
   private final Box box2 = Box.createHorizontalBox();
   private final Box box3 = Box.createHorizontalBox();
   private final Box box4 = Box.createHorizontalBox();
+  private final Box box6 = Box.createHorizontalBox();
   private final Box box5 = Box.createVerticalBox();
+  String username = null;
 
   /**
    *
@@ -51,8 +57,23 @@ public class LoginView
        if(e.getSource() == jRadioButton1 || e.getSource() == jRadioButton2 || e.getSource() == jRadioButton3){
          position = e.getActionCommand();
        }
+       if(e.getSource() == jRadioButton4){
+         if(jRadioButton4.isSelected()){
+           keepPass = e.getActionCommand();
+         }
+         else{
+           keepPass = "不保存密码";
+         }
+       }
+       if(e.getSource() == jRadioButton5){
+         if(jRadioButton5.isSelected()){
+           auto = e.getActionCommand();
+         }
+         else{
+           auto = "不自动登录";
+         }
+       }
        if(e.getSource() == jButton1){
-         String username = jTextField.getText();
          String password = String.valueOf(jPasswordField.getPassword());
          check(username, password,position);
        }
@@ -97,6 +118,19 @@ public class LoginView
         new UserView().init(name);
         System.out.println("用户登录成功");
         jf.dispose();
+        if(keepPass.equals("保存密码")){
+          userService.keepPass(1,name);
+        }
+        if(keepPass.equals("不保存密码")) {
+          userService.keepPass(0,name);
+        }
+        if(auto.equals("自动登录")){
+          userService.updateAutoMysql(name);
+        }
+        if(auto.equals("不自动登录")){
+          userService.updateAutoMysql();
+        }
+
       }
       else{
         JOptionPane.showMessageDialog(null,"账号或密码或身份错误");
@@ -121,11 +155,11 @@ public class LoginView
    * 组装登录界面
    */
   public void init(){
-    jTextField.setPreferredSize(new Dimension(250,30));
+    jComboBox.setPreferredSize(new Dimension(250,30));
     jPasswordField.setPreferredSize(new Dimension(250,30));
     box1.add(jLabel1);
     box1.add(Box.createHorizontalStrut(10));
-    box1.add(jTextField);
+    box1.add(jComboBox);
     box2.add(jLabel2);
     box2.add(Box.createHorizontalStrut(10));
     box2.add(jPasswordField);
@@ -140,20 +174,53 @@ public class LoginView
     box4.add(jRadioButton2);
     box4.add(Box.createHorizontalStrut(20));
     box4.add(jRadioButton3);
-    box5.add(Box.createVerticalStrut(40));
+    box6.add(jRadioButton4);
+    box6.add(Box.createHorizontalStrut(20));
+    box6.add(jRadioButton5);
+    box5.add(Box.createVerticalStrut(20));
     box5.add(box1);
     box5.add(Box.createVerticalStrut(20));
     box5.add(box2);
     box5.add(Box.createVerticalStrut(20));
     box5.add(box3);
     box5.add(Box.createVerticalStrut(20));
+    box5.add(box6);
+    box5.add(Box.createVerticalStrut(20));
     box5.add(box4);
     jf.add(Box.createHorizontalStrut(100),BorderLayout.EAST);
     jf.add(Box.createHorizontalStrut(100),BorderLayout.WEST);
+    jf.add(Box.createVerticalStrut(50),BorderLayout.NORTH);
+    jf.add(Box.createVerticalStrut(50),BorderLayout.SOUTH);
+
     jf.add(box5);
-    jf.setBounds((ScreenUtil.getScreenWidth() - 900)/2 + 300, (ScreenUtil.getScreenHeight() - 450)/2 + 80, 900, 450);
+    jf.setBounds((ScreenUtil.getScreenWidth() - 900)/2 + 250, (ScreenUtil.getScreenHeight() - 450)/2 , 900, 700);
     jf.pack();
     jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+    jComboBox.addItemListener(e ->{
+      username = (String) jComboBox.getSelectedItem();
+      if(userService.keepPasswordMysql(username) == 1){
+        jPasswordField.setText(userService.lookPasswordMysql(username));
+        jRadioButton4.setSelected(true);
+      }
+      else{
+        jPasswordField.setText("");
+        jRadioButton4.setSelected(false);
+      }
+      if(userService.lookAutoMysql(username) == 1){
+        jRadioButton5.setSelected(true);
+      }
+      else{
+        jRadioButton5.setSelected(false);
+      }
+
+    });
+
+
+    jComboBox.setEditable(true);
+    jComboBox.setSelectedIndex(-1);
+
+
     jf.setResizable(false);
     jf.setVisible(true);
 
@@ -163,11 +230,20 @@ public class LoginView
     jRadioButton1.addActionListener(new LoginListener());
     jRadioButton2.addActionListener(new LoginListener());
     jRadioButton3.addActionListener(new LoginListener());
+    jRadioButton4.addActionListener(new LoginListener());
+    jRadioButton5.addActionListener(new LoginListener());
+
   }
 
 
     public static void main(String[] args) {
+    UserService userService1 = new UserService();
+    if(userService1.lookautoMysql() != null){
+      new UserView().init(userService1.lookautoMysql());
+    }else{
       new LoginView().init();
     }
+
+  }
 
 }

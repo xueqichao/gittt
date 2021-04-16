@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -35,6 +36,8 @@ public class AdminView
     DefaultMutableTreeNode treeNode2 = new DefaultMutableTreeNode("门票管理");
     DefaultMutableTreeNode treeNode3 = new DefaultMutableTreeNode("用户管理");
     DefaultMutableTreeNode treeNode4 = new DefaultMutableTreeNode("景评管理");
+    DefaultMutableTreeNode treeNode5 = new DefaultMutableTreeNode("投诉管理");
+    DefaultMutableTreeNode treeNode6 = new DefaultMutableTreeNode("处理投诉");
 
 
     /**
@@ -81,6 +84,8 @@ public class AdminView
         root.add(treeNode2);
         root.add(treeNode3);
         root.add(treeNode4);
+        root.add(treeNode5);
+        root.add(treeNode6);
 
         JTree jTree = new JTree(root);
 
@@ -106,7 +111,13 @@ public class AdminView
                     jSplitPane.setRightComponent(new AdminTree3View());
                 }
                 else if(treeNode4.equals(lastPathComponent)){
-                    jSplitPane.setRightComponent(new JLabel("这里进行景评管理。。。"));
+                    jSplitPane.setRightComponent(new AdminTree4View());
+                }
+                else if(treeNode5.equals(lastPathComponent)){
+                    jSplitPane.setRightComponent(new AdminTree5View());
+                }
+                else if(treeNode6.equals(lastPathComponent)){
+                    jSplitPane.setRightComponent(new AdminTree6View());
                 }
             }
         });

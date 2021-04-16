@@ -35,7 +35,6 @@ public class AdminTree2View extends Box
     JButton jButton1 = new JButton("添加");
     JButton jButton2 = new JButton("删除");
     JButton jButton3 = new JButton("修改");
-    JButton update = new JButton("刷新");
 
     JTable jTable;
 
@@ -50,13 +49,11 @@ public class AdminTree2View extends Box
         jPanel.add(jButton1);
         jPanel.add(jButton2);
         jPanel.add(jButton3);
-        jPanel.add(update);
 
 
         jButton1.addActionListener(new AdminTree2View.MyListener());
         jButton2.addActionListener(new AdminTree2View.MyListener());
         jButton3.addActionListener(new AdminTree2View.MyListener());
-        update.addActionListener(new AdminTree2View.MyListener());
 
 
         v1.add("序   号");
@@ -96,7 +93,7 @@ public class AdminTree2View extends Box
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == jButton1){
-                new AdminTree2View().initAdd();
+                new AdminTree2View().initAdd(jTable);
             }
             if(e.getSource() == jButton2){
                 if(row == -1){
@@ -106,11 +103,13 @@ public class AdminTree2View extends Box
                     int a = JOptionPane.showConfirmDialog(null,"确认删除吗?","确认",JOptionPane.YES_NO_OPTION);
                     if(a == 0){
                         if(ticketService.deleteTicketMysql(tid) == 1){
-                            JOptionPane.showMessageDialog(null,"删除成功，请刷新！");
+                            JOptionPane.showMessageDialog(null,"删除成功！");
+                            new AdminTree2View().updateTable(jTable);
                         }
                         else{
-                            JOptionPane.showMessageDialog(null,"选择的信息已不存在，请刷新！");
+                            JOptionPane.showMessageDialog(null,"该票有用户订购，不能删除！");
                         }
+
                     }
                 }
             }
@@ -119,17 +118,8 @@ public class AdminTree2View extends Box
                     JOptionPane.showMessageDialog(null,"请选择要修改的信息！");
                 }
                 else{
-                    new AdminTree2View().initUpdate(ticketService.getInstance(tid),scenicName);
+                    new AdminTree2View().initUpdate(ticketService.getInstance(tid),scenicName,jTable);
                 }
-            }
-            if(e.getSource() == update){
-                DefaultTableModel dtm = (DefaultTableModel) jTable.getModel();
-                dtm.setRowCount(0);
-                for(Vector v : ticketService.lookTicket()){
-                    dtm.addRow(v);
-                    row = -1;
-                }
-
             }
 
         }
@@ -158,7 +148,10 @@ public class AdminTree2View extends Box
     Box box5 = Box.createHorizontalBox();
     Box box6 = Box.createVerticalBox();
 
-    private void initAdd(){
+    private void initAdd(JTable jTable1){
+
+        jTable = jTable1;
+
         jFrame1.setBounds((ScreenUtil.getScreenWidth() - 450)/2,(ScreenUtil.getScreenHeight() - 400)/2,450,400);
 
         box1.add(jLabel1);
@@ -219,21 +212,25 @@ public class AdminTree2View extends Box
                 if(scenic1 == null){
                     JOptionPane.showMessageDialog(null,"请输入正确的景点！");
                 }
-                else if(jTextField2.getText().equals("")){
+                else if("".equals(jTextField2.getText())){
                     JOptionPane.showMessageDialog(null,"参观时间不能为空！");
                 }
-                else if(jTextField3.getText().equals("")){
+                else if("".equals(jTextField3.getText())){
                     JOptionPane.showMessageDialog(null,"票数总量不能为空！");
                 }
-                else if(jTextField4.getText().equals("")){
+                else if("".equals(jTextField4.getText())){
                     JOptionPane.showMessageDialog(null,"单票价格不能为空！");
+                }
+                else if(ticketService.getInstanceMysql(scenic1.getSid(),jTextField2.getText()) != null){
+                    JOptionPane.showMessageDialog(null,"该景点在此时间点已有门票！");
                 }
                 else{
                     String time1 = jTextField2.getText();
                     int number1 = Integer.parseInt(jTextField3.getText());
                     int price1 = Integer.parseInt(jTextField4.getText());
                     ticketService.keepTicketMysql(time1,number1,scenic1.getSid(),price1);
-                    JOptionPane.showMessageDialog(null,"添加成功,请刷新！");
+                    JOptionPane.showMessageDialog(null,"添加成功！");
+                    new AdminTree2View().updateTable(jTable);
                     jFrame1.dispose();
                 }
             }
@@ -253,8 +250,10 @@ public class AdminTree2View extends Box
      * @param scienceName  选中的信息对应的景点名称
      */
 
-    private void initUpdate(Ticket ticket,String scienceName){
+    private void initUpdate(Ticket ticket,String scienceName,JTable jTable1){
         jFrame2.setBounds((ScreenUtil.getScreenWidth() - 450)/2,(ScreenUtil.getScreenHeight() - 400)/2,450,400);
+
+        jTable = jTable1;
 
         tid = ticket.getTid();
         ticket1 = ticket;
@@ -329,16 +328,17 @@ public class AdminTree2View extends Box
                 else if("".equals(jTextField3.getText())){
                     JOptionPane.showMessageDialog(null,"票数总量不能为空！");
                 }
-                else if("".equals(jTextField4)){
+                else if("".equals(jTextField4.getText())){
                     JOptionPane.showMessageDialog(null," 单票价格不能为空！");
                 }
                 else if(ticket1.getTime().equals(time) && ticket1.getNumber() == number && ticket1.getPrice() == price){
                     JOptionPane.showMessageDialog(null,"您并未作出修改！");
                 }
                 else{
-                    JOptionPane.showMessageDialog(null,"修改成功！请刷新！");
+                    JOptionPane.showMessageDialog(null,"修改成功！");
                     jFrame2.dispose();
                     ticketService.upDateTicket(tid,time,number,price);
+                    new AdminTree2View().updateTable(jTable);
                 }
 
             }
@@ -349,6 +349,14 @@ public class AdminTree2View extends Box
         }
     }
 
+    public void updateTable(JTable jTable){
+        DefaultTableModel dtm = (DefaultTableModel) jTable.getModel();
+        dtm.setRowCount(0);
+        for(Vector v : ticketService.lookTicket()){
+            dtm.addRow(v);
+            row = -1;
+        }
+    }
 
 
 

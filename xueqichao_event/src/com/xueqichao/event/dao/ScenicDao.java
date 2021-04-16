@@ -13,7 +13,7 @@ public class ScenicDao
 {
 
     public Vector<Vector> lookScenicMysql() {
-        String sql1 = "select * from s_information";
+        String sql1 = "SELECT * from s_information ORDER BY sat_num DESC";
         Vector vector = new Vector();
         Connection co = null;
         PreparedStatement ps = null;
@@ -28,6 +28,7 @@ public class ScenicDao
                 vector1.add(rs.getInt("sid"));
                 vector1.add(rs.getString("science_name"));
                 vector1.add(rs.getString("science_desc"));
+                vector1.add(rs.getInt("sat_num"));
                 vector.add(vector1);
             }
         } catch (SQLException throwable) {
@@ -111,7 +112,7 @@ public class ScenicDao
             ps.setInt(1, sid);
             rs = ps.executeQuery();
             if (rs.next()) {
-                scenic = new Scenic(rs.getInt(1),rs.getString(2), rs.getString(3));
+                scenic = new Scenic(rs.getInt(1),rs.getString(2), rs.getString(3),rs.getInt(4));
             }
         } catch (SQLException throwable) {
             throwable.printStackTrace();
@@ -143,12 +144,51 @@ public class ScenicDao
         return scenic;
     }
 
+    public int updateScenicMysql(int sid,int sta_num) {
+        String sql1 = "update s_information set sat_num=? where sid=?";
+        Connection co = null;
+        PreparedStatement ps = null;
+        int a = 0;
+        try {
+            co = JdbcUtil.getConnection();
+            ps = co.prepareStatement(sql1);
+            ps.setInt(1,sta_num);
+            ps.setInt(2,sid);
+            a = ps.executeUpdate();
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        } finally {
+            JdbcUtil.close(co, ps);
+        }
+        return a;
+    }
 
-
-
-
-
-
+    public Vector<Vector> lookScenicMysql(String information) {
+        String sql1 = "SELECT * FROM s_information where science_name like ? ORDER BY sat_num DESC";
+        Vector vector = new Vector();
+        Connection co = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            co = JdbcUtil.getConnection();
+            ps = co.prepareStatement(sql1);
+            ps.setString(1,"%" + information + "%");
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Vector vector1 = new Vector();
+                vector1.add(rs.getInt("sid"));
+                vector1.add(rs.getString("science_name"));
+                vector1.add(rs.getString("science_desc"));
+                vector1.add(rs.getInt("sat_num"));
+                vector.add(vector1);
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        } finally {
+            JdbcUtil.close(co, ps,rs);
+        }
+        return vector;
+    }
 
 
 
