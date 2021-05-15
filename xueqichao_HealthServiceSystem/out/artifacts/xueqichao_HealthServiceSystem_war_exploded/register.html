@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册界面</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script>
+        function checkUsername(){
+            var username = $("#registerUsername").val();
+            var reg_username = /^\w{8,20}$/;
+            var flag = reg_username.test(username);
+            if(flag){
+                $("#registerUsername").css("border","1px solid green");
+            }else{
+                $("#registerUsername").css("border","1px solid red" );
+            }
+            return flag;
+        }
+
+        function checkPassword(){
+            var password = $("#registerPassword").val();
+            var reg_password = /^\w{8,20}$/;
+            var flag = reg_password.test(password);
+            if(flag){
+                $("#registerPassword").css("border","1px solid green");
+            }else{
+                $("#registerPassword").css("border","1px solid red" );
+            }
+            return flag;
+        }
+
+        function checkIdentity(){
+            var identity = $("#registerIdentity").val();
+            var flag = (identity != "");
+            if(flag){
+                $("#registerIdentity").css("border","1px solid green");
+            }else{
+                $("#registerIdentity").css("border","1px solid red" );
+            }
+            return flag;
+        }
+
+        $(function (){
+            $("#registerForm").submit(function (){
+                if(checkPassword() && checkUsername() && checkIdentity()){
+                    $.post("registerServlet",$(this).serialize(),function (data) {
+                        if(data.userExist){
+                            alert(data.msg)
+                        }else{
+                            alert(data.msg)
+                        }
+                    },"json")
+                }
+                return false;
+            });
+
+            $("#registerUsername").blur(checkUsername);
+            $("#registerPassword").blur(checkPassword);
+            $("#registerIdentity").blur(checkIdentity);
+
+        });
+
+    </script>
+
+</head>
+<body>
+<h1 align="center">注册界面</h1>
+<form method="post" id="registerForm" action="registerServlet">
+    <table align="center">
+        <tr>
+            <td>用户名:</td>
+            <td><input type="text" name="registerUsername" id="registerUsername"></td>
+        </tr>
+
+        <tr>
+            <td>密码:</td>
+            <td><input type="password" name="registerPassword" id="registerPassword"></td>
+        </tr>
+
+        <tr>
+            <td>身份:</td>
+            <td><select name="registerIdentity" id="registerIdentity">
+                <option value="">--请选择--</option>
+                <option value="普通用户">普通用户</option>
+                <option value="工作者">工作者</option>
+            </select></td>
+        </tr>
+
+        <tr>
+            <td><input type="submit" value="确认" id="registerBtn"></td>
+            <td><a href="#"><input type="button" value="返回"></a></td>
+        </tr>
+
+    </table>
+</form>
+
+</body>
+</html>
